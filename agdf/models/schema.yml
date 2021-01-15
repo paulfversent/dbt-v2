@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: vw_debit_missed
+    description: Primary Key for view 'vw_debit_missed'
+    tests:
+      - not_null:
+          column_name: SCHDITMID
+      - not_null:
+          column_name: CSTMR
+      - unique:
+          column_name: "CAST(SCHDITMID AS varchar(100)) ||'-'|| CAST(CSTMR AS varchar(100)) ||'-'|| CAST(DELIVERY_DT AS varchar(10))"
+  
+  - name: vw_deposit_missed
+    description: Primary Key for view 'vw_deposit_missed'
+    tests:
+      - not_null:
+          column_name: SCHDITMID
+      - not_null:
+          column_name: CSTMR      
+      - unique:
+          column_name: "CAST(SCHDITMID AS varchar(100)) ||'-'|| CAST(CSTMR AS varchar(100)) ||'-'|| CAST(DELIVERY_DT AS varchar(10))"
+
+  - name: vw_sundry_missed
+    description: Primary Key for view 'vw_sundry_missed'
+    tests:
+      - not_null:
+          column_name: SCHDITMID
+      - not_null:
+          column_name: CSTMR      
+      - unique:
+          column_name: "CAST(SCHDITMID AS varchar(100)) ||'-'|| CAST(CSTMR AS varchar(100)) ||'-'|| CAST(DELIVERY_DT AS varchar(10))"
