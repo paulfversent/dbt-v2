@@ -5,7 +5,7 @@ default: populate_dbt_profile_file init_dbt_project setup_dbt_project_file valid
 #create environment variables (needed for 'setup_dbt_profile')
 export DBT_PROJECT_NAME=${DBT_PROJ_NAME}
 export DBT_PROFILE_NAME=${DBT_PROF_NAME}
-export DBT_MODEL_NAME=${MODEL_NAME}
+export DBT_MODEL_NAME=pf_curated_db
 export SNOWFLAKE_ACCOUNT=${SF_ACC}
 export SNOWFLAKE_DB=${SF_DB}
 export SNOWFLAKE_WH=${SF_WH}
@@ -17,6 +17,7 @@ export SNOWFLAKE_ROLE=${SF_ROLE}
 deps:
 	$(info [+] Install dependencies (dbt))
 	pip install dbt
+	pip install --upgrade dbt
 	brew install gettext
 	brew link --force gettext
 	brew install gnu-sed
@@ -66,15 +67,42 @@ validate_conn:
 	cd ${DBT_PROJECT_NAME} && dbt debug --profiles-dir=profiles
 
 run_model:
-	cd ${DBT_PROJECT_NAME} && dbt run --profiles-dir profiles --models ${DBT_MODEL_NAME}
+	cd ${DBT_PROJECT_NAME} && dbt run --profiles-dir profiles --models pf_agdf_raw_db --profile agdf-raw-db
 
 test_model:
 	#prerequisite: populate agdf/models/schema.yml with any desired tests
 	cd ${DBT_PROJECT_NAME} && dbt test --profiles-dir profiles --models ${DBT_MODEL_NAME}
 
+data_test_model:
+	#prerequisite: populate agdf/models/schema.yml with any desired tests
+	cd ${DBT_PROJECT_NAME} && dbt test --data --profiles-dir profiles --models ${DBT_MODEL_NAME}
+
 document_model:
 	cd ${DBT_PROJECT_NAME} && dbt docs generate --profiles-dir profiles --models ${DBT_MODEL_NAME}
 	cd ${DBT_PROJECT_NAME} && dbt docs serve --profiles-dir profiles
+
+ref_test:
+	#cd agdf/ && dbt run-operation stage_external_sources --args 'select: pf_test.ext_brnch' --profiles-dir profiles
+	cd agdf/ && dbt run-operation stage_external_sources --profiles-dir profiles
+	#cd agdf/ && dbt run-operation refresh_external_table --profiles-dir profiles
+	#cd agdf/ && dbt run-operation refresh_external_table --vars '{source_node: pf_test}' --profiles-dir profiles
+	#cd agdf/ && dbt run-operation refresh_external_table --vars 'source_node: pf_test' --profiles-dir profiles
+	#cd agdf/ && dbt run-operation --help
+
+works_tbc:
+	cd agdf/ && dbt run-operation stage_external_sources --profiles-dir profiles  --args 'select: pf_test.ext_brnch2'
+
+works2:
+	cd agdf/ && dbt run-operation stage_external_sources --profiles-dir profiles
+
+test:
+	cd agdf/ && dbt run-operation refresh_external_table --profiles-dir profiles --vars 'source_node: snowflake'
+
+josh:
+	#create the ext tables
+	cd agdf/ && dbt run-operation stage_external_sources --profiles-dir profiles --profile agdf-raw-db --vars 'ext_full_refresh: true'
+	#then create the tables
+	#cd agdf/ && dbt run --profiles-dir profiles --models pf_agdf_raw_db --profile agdf-raw-db
 
 ###############
 # Dev scripts

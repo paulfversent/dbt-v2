@@ -1,32 +1,137 @@
 version: 2
 
-models:
-  - name: vw_debit_missed
-    description: Primary Key for view 'vw_debit_missed'
-    tests:
-      - not_null:
-          column_name: SCHDITMID
-      - not_null:
-          column_name: CSTMR
-      - unique:
-          column_name: "CAST(SCHDITMID AS varchar(100)) ||'-'|| CAST(CSTMR AS varchar(100)) ||'-'|| CAST(DELIVERY_DT AS varchar(10))"
-  
-  - name: vw_deposit_missed
-    description: Primary Key for view 'vw_deposit_missed'
-    tests:
-      - not_null:
-          column_name: SCHDITMID
-      - not_null:
-          column_name: CSTMR      
-      - unique:
-          column_name: "CAST(SCHDITMID AS varchar(100)) ||'-'|| CAST(CSTMR AS varchar(100)) ||'-'|| CAST(DELIVERY_DT AS varchar(10))"
-
-  - name: vw_sundry_missed
-    description: Primary Key for view 'vw_sundry_missed'
-    tests:
-      - not_null:
-          column_name: SCHDITMID
-      - not_null:
-          column_name: CSTMR      
-      - unique:
-          column_name: "CAST(SCHDITMID AS varchar(100)) ||'-'|| CAST(CSTMR AS varchar(100)) ||'-'|| CAST(DELIVERY_DT AS varchar(10))"
+sources:
+  - name: sirius
+    database: "{{ env_var('AGDF_RAW_DB') }}"
+    schema: SIRIUS
+    tables:
+      - name: ext_brnch
+        external:
+          location: "@sirius_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\sirius/dbo/brnch\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: ext_cstmr
+        external:
+          location: "@sirius_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\sirius/dbo/cstmr\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: ext_mjrclnt
+        external:
+          location: "@sirius_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\sirius/dbo/mjrClnt\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: ext_mjrclntdvsn
+        external:
+          location: "@sirius_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\sirius/dbo/mjrClntDvsn\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: ext_schdlbtch
+        external:
+          location: "@sirius_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\sirius/dbo/schdlBtch\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: ext_schdlfrqncy
+        external:
+          location: "@sirius_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\sirius/dbo/schdlFrqncy\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: ext_schdlitm
+        external:
+          location: "@sirius_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\sirius/dbo/schdlItm\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: ext_schdlstts
+        external:
+          location: "@sirius_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\sirius/dbo/schdlStts\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: ext_schdltyp
+        external:
+          location: "@sirius_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\sirius/dbo/schdlTyp\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: ext_srvccd
+        external:
+          location: "@sirius_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\sirius/dbo/srvcCd\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: brnch
+      - name: cstmr
+      - name: mjrclnt
+      - name: mjrclntdvsn
+      - name: schdlbtch
+      - name: schdlfrqncy
+      - name: schdlitm
+      - name: schdlstts
+      - name: schdltyp
+      - name: srvccd
+  - name: checkguard
+    database: "{{ env_var('AGDF_RAW_DB') }}"
+    schema: checkguard
+    tables:
+      - name: ext_cntrlshts
+        external:
+          location: "@checkguard_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\checkguard/chkguard_brch001/cntrlshts\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: ext_dbt
+        external:
+          location: "@checkguard_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\checkguard/chkguard_brch001/dbt\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: ext_dpst
+        external:
+          location: "@checkguard_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\checkguard/chkguard_brch001/dpst\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: ext_sndry
+        external:
+          location: "@checkguard_stage"
+          file_format: "UTILITIES.PARQUET_FMT"
+          pattern: '.*\checkguard/chkguard_brch001/sndry\/(?:.*)(?:\.parquet)'
+          columns:
+            - name: value
+              data_type: variant
+      - name: cntrlshts
+      - name: dbt
+      - name: dpst
+      - name: sndry
